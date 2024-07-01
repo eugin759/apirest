@@ -38,22 +38,25 @@ public class TokenService {
         if(token==null){
             throw new RuntimeException("token nullo");
         }
+        DecodedJWT verifier = null;
         try {
             Algorithm algorithm = Algorithm.HMAC256(apiSecret);
-            return  JWT.require(algorithm)
+            verifier =  JWT.require(algorithm)
                     .withIssuer("voll med")
                     .build()
-                    .verify(token)
-                    .getSubject();
-
-
+                    .verify(token);
+                    verifier.getSubject();
         } catch (JWTVerificationException exception) {
-            throw new RuntimeException("token invalido");
+            System.out.println(exception.toString());
         }
+        if (verifier.getSubject() == null) {
+            throw new RuntimeException("Verifier invalido");
+        }
+        return verifier.getSubject();
     }
 
 
     private Instant generarFechaExpiracion(){
-        return LocalDateTime.now().plusHours(30).toInstant(ZoneOffset.of("-05:00"));
+        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-05:00"));
     }
 }
